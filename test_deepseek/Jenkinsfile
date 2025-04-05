@@ -56,34 +56,39 @@ pipeline {
 
 
     stage('Upload SBOM file') {
-      steps {
-        script {
-          dir(env.PROJECT_DIR) {
-            if (fileExists('target/bom.xml')) {
-              echo 'Uploading SBOM to Dependency-Track...'
-              sh """
-             curl -X "POST" "${DEP_TRACK_API_URL}/v1/bom" \
-                  -H 'Content-Type: multipart/form-data' \
-                  -H 'X-API-Key: ${DEP_TRACK_API_KEY}' \
-                  -F "autoCreate=false" \
-                  -F "project=${PROJECT_UUID}" \
-                  -F "bom=@${SBOM_FILE_PATH}"
-              """
-            } else {
-              error "SBOM file not found at ${SBOM_FILE_PATH}"
+        steps {
+            script {
+                dir(env.PROJECT_DIR) {
+                    // Debugging the file location
+                    sh "ls -al ${WORKSPACE}/${SBOM_FILE_PATH}"
+
+                    // Check if the file exists
+                    if (fileExists("${WORKSPACE}/${SBOM_FILE_PATH}")) {
+                        echo 'Uploading SBOM to Dependency-Track...'
+                        sh """
+                          curl -X "POST" "${DEP_TRACK_API_URL}/v1/bom" \
+                            -H 'Content-Type: multipart/form-data' \
+                            -H 'X-API-Key: ${DEP_TRACK_API_KEY}' \
+                            -F "autoCreate=false" \
+                            -F "project=${PROJECT_UUID}" \
+                            -F "bom=@${WORKSPACE}/${SBOM_FILE_PATH}"
+                        """
+                    } else {
+                        error "SBOM file not found at ${WORKSPACE}/${SBOM_FILE_PATH}"
+                    }
+                }
             }
-          }
         }
-      }
-      post {
-        success {
-          echo 'SBOM file successfully uploaded to Dependency-Track!'
+        post {
+            success {
+                echo 'SBOM file successfully uploaded to Dependency-Track!'
+            }
+            failure {
+                echo 'Failed to upload SBOM file to Dependency-Track!'
+            }
         }
-        failure {
-          echo 'Failed to upload SBOM file to Dependency-Track!'
-        }
-      }
     }
+
 
 
     stage('Check Dependency Vulnerabilities') {
