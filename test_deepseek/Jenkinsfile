@@ -58,6 +58,7 @@ pipeline {
     stage('Upload SBOM file') {
       steps {
         script {
+          dir(env.PROJECT_DIR) {
             if (fileExists('target/bom.xml')) {
               echo 'Uploading SBOM to Dependency-Track...'
               sh """
@@ -66,14 +67,14 @@ pipeline {
                   -H 'X-API-Key: ${DEP_TRACK_API_KEY}' \
                   -F "autoCreate=false" \
                   -F "project=${PROJECT_UUID}" \
-                  -F "bom=@target/bom.xml"
+                  -F "bom=@${SBOM_FILE_PATH}"
               """
             } else {
               error "SBOM file not found at ${SBOM_FILE_PATH}"
             }
           }
         }
-
+      }
       post {
         success {
           echo 'SBOM file successfully uploaded to Dependency-Track!'
