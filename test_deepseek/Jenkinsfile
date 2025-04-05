@@ -61,12 +61,12 @@ pipeline {
             if (fileExists('target/bom.xml')) {
               echo 'Uploading SBOM to Dependency-Track...'
               sh """
-                curl -f -X "POST" "${DEP_TRACK_API_URL}/v1/bom" \
+             curl -X "POST" "${DEP_TRACK_API_URL}/v1/bom" \
                   -H 'Content-Type: multipart/form-data' \
                   -H 'X-API-Key: ${DEP_TRACK_API_KEY}' \
-                  -F "autoCreate=true" \
+                  -F "autoCreate=false" \
                   -F "project=${PROJECT_UUID}" \
-                  -F "bom=@target/bom.xml"
+                  -F "bom=@${SBOM_FILE_PATH}"
               """
             } else {
               error "SBOM file not found at ${SBOM_FILE_PATH}"
