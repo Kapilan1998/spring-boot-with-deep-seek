@@ -60,7 +60,9 @@ pipeline {
             script {
                 dir(env.PROJECT_DIR) {
                     // Debugging the file location
-                    sh "ls -al ${WORKSPACE}/${SBOM_FILE_PATH}"
+                    sh """
+                        ls -al "${WORKSPACE}/${SBOM_FILE_PATH}"
+                    """
 
                     // Check if the file exists
                     if (fileExists("${WORKSPACE}/${SBOM_FILE_PATH}")) {
@@ -88,6 +90,7 @@ pipeline {
             }
         }
     }
+
 
 
 
