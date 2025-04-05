@@ -1,5 +1,10 @@
 pipeline {
-  agent any
+
+  agent {
+            docker {
+              image 'maven:3.9.6-eclipse-temurin-21-alpine'
+            }
+        }
 
   tools {
     maven 'Maven3'
@@ -16,6 +21,13 @@ pipeline {
   }
 
   stages {
+
+            stage('Java Version Check') {
+                  steps {
+                    sh 'java -version'
+                    sh 'mvn -version'
+                  }
+                }
 
             stage('Build') {
                   steps {
