@@ -48,7 +48,8 @@ pipeline {
           echo 'SBOM file generation failed!'
         }
         always {
-          archiveArtifacts artifacts: "${SBOM_FILE_PATH},${PROJECT_DIR}/target/bom.json", allowEmptyArchive: true
+        archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/bom.json'
+        archiveArtifacts allowEmptyArchive: true, artifacts: '**/target/bom.xml'
         }
       }
     }
@@ -57,7 +58,6 @@ pipeline {
     stage('Upload SBOM file') {
       steps {
         script {
-          dir(env.PROJECT_DIR) {
             if (fileExists('target/bom.xml')) {
               echo 'Uploading SBOM to Dependency-Track...'
               sh """
@@ -66,14 +66,14 @@ pipeline {
                   -H 'X-API-Key: ${DEP_TRACK_API_KEY}' \
                   -F "autoCreate=false" \
                   -F "project=${PROJECT_UUID}" \
-                  -F "bom=@${SBOM_FILE_PATH}"
+                  -F "bom=@target/bom.xml"
               """
             } else {
               error "SBOM file not found at ${SBOM_FILE_PATH}"
             }
           }
         }
-      }
+
       post {
         success {
           echo 'SBOM file successfully uploaded to Dependency-Track!'
