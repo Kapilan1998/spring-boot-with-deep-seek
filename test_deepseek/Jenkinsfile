@@ -6,7 +6,9 @@ pipeline {
   }
 
   environment {
+        // Base directory containing pom.xml
          PROJECT_DIR = 'test_deepseek'
+        // Paths relative to PROJECT_DIR
         SBOM_FILE_PATH = "${PROJECT_DIR}/target/bom.xml"
         DEP_TRACK_API_URL = 'http://localhost:8082/api'
         DEP_TRACK_API_KEY = 'odt_dWinsHFt2G95wGSjLHG5igPmGFpHqtg3'
@@ -62,23 +64,23 @@ pipeline {
                         ls -al "${WORKSPACE}/${SBOM_FILE_PATH}"
                     """
 
+                    sh '''
+                         echo "Running basic shell commands..."
+                         pwd
+                         echo "Script executed successfully!"
+                        '''
                     // Check if the file exists
                     if (fileExists("${WORKSPACE}/${SBOM_FILE_PATH}")) {
                         echo 'Uploading SBOM to Dependency-Track...'
-                         sh '''
-                                                echo "Running basic shell commands..."
-                                                pwd
-                                                echo "Script executed successfully!"
-                             '''
-
                         sh """
-                          curl -X "POST" "http://localhost:8082/api/v1/bom" \
+                          curl -X "POST" "http://dtrack-backend:8080/api/v1/bom" \
                                -H 'Content-Type: multipart/form-data' \
-                               -H 'X-API-Key: odt_dWinsHFt2G95wGSjLHG5igPmGFpHqtg3'  \
+                               -H 'X-API-Key: odt_dWinsHFt2G95wGSjLHG5igPmGFpHqtg3' \
                                -F "autoCreate=false" \
                                -F "project=421a9c86-4dcb-46c0-9731-0bc6cc7442f9" \
                                -F "bom=@${WORKSPACE}/${SBOM_FILE_PATH}"
                         """
+
                     } else {
                         error "SBOM file not found at ${WORKSPACE}/${SBOM_FILE_PATH}"
                     }
