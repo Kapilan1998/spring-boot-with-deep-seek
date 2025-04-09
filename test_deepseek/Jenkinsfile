@@ -105,28 +105,37 @@ pipeline {
             script {
                 echo 'Checking vulnerabilities in Dependency-Track...'
 
+                // Get vulnerabilities from Dependency-Track API
                 def response = sh(
                     script: """
                         curl -s -X "GET" "${DEP_TRACK_API_URL}/v1/finding/project/${PROJECT_UUID}" \\
-                            -H 'X-API-Key: ${DEP_TRACK_API_KEY}' | \\
-                        jq '[.[] | select(.analysis.isSuppressed == false) | .vulnerability.severity] |
-                            group_by(.) |
-                            map({(.[0]): length}) |
-                            add'
+                            -H 'X-API-Key: ${DEP_TRACK_API_KEY}'
                     """,
                     returnStdout: true
                 ).trim()
 
-                echo "Vulnerability Report: ${response}"
+                // Debug: Print raw response
+                echo "Raw Response: ${response}"
 
+                // Check if the response is not empty
+                if (!response) {
+                    error "No data returned from Dependency-Track API!"
+                }
+
+                // Process the response as JSON
                 def vulnData = readJSON text: response
+
+                // Extract counts from the JSON data
                 def criticalCount = vulnData.CRITICAL ?: 0
                 def highCount = vulnData.HIGH ?: 0
                 def mediumCount = vulnData.MEDIUM ?: 0
                 def lowCount = vulnData.LOW ?: 0
                 def unassignedCount = vulnData.UNASSIGNED ?: 0
+
+                // Output the counts
                 echo "Critical: ${criticalCount}, High: ${highCount}, Medium: ${mediumCount}, Low: ${lowCount}, Unassigned: ${unassignedCount}"
 
+                // Abort the pipeline if there are critical or high vulnerabilities
                 def vulnerabilitiesExist = (criticalCount > 0 || highCount > 0)
                 if (vulnerabilitiesExist) {
                     error "Pipeline aborted due to detected vulnerabilities: CRITICAL=${criticalCount}, HIGH=${highCount}"
@@ -136,6 +145,7 @@ pipeline {
             }
         }
     }
+
 
 
 
