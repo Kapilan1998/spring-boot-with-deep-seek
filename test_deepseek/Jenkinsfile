@@ -10,7 +10,7 @@ pipeline {
          PROJECT_DIR = 'test_deepseek'
         // Paths relative to PROJECT_DIR
         SBOM_FILE_PATH = "${PROJECT_DIR}/target/bom.xml"
-        DEP_TRACK_API_URL = 'http://localhost:8082/api'
+        DEP_TRACK_API_URL = 'http://apiserver:8080/api'
         DEP_TRACK_API_KEY = 'odt_dWinsHFt2G95wGSjLHG5igPmGFpHqtg3'
         PROJECT_UUID = '421a9c86-4dcb-46c0-9731-0bc6cc7442f9'
   }
@@ -73,7 +73,7 @@ pipeline {
                     if (fileExists("${WORKSPACE}/${SBOM_FILE_PATH}")) {
                         echo 'Uploading SBOM to Dependency-Track...'
                         sh """
-                          curl -X "POST" "http://localhost:8082//api/v1/bom" \
+                          curl -X "POST" "http://apiserver:8080/api/v1/bom" \
                                -H 'Content-Type: multipart/form-data' \
                                -H 'X-API-Key: odt_dWinsHFt2G95wGSjLHG5igPmGFpHqtg3' \
                                -F "autoCreate=false" \
