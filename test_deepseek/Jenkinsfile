@@ -1,5 +1,5 @@
 pipeline {
-  agent any  // Runs on any available node
+  agent any
 
   tools {
     maven 'Maven3'
@@ -11,8 +11,8 @@ pipeline {
         // Paths relative to PROJECT_DIR
         SBOM_FILE_PATH = "${PROJECT_DIR}/target/bom.xml"
         DEP_TRACK_API_URL = 'http://apiserver:8080/api'
-        DEP_TRACK_API_KEY = 'odt_dWinsHFt2G95wGSjLHG5igPmGFpHqtg3'
-        PROJECT_UUID = '421a9c86-4dcb-46c0-9731-0bc6cc7442f9'
+        DEP_TRACK_API_KEY = 'odt_eHtSvIqEq2XeipMA7fvnDW70G6IuXQCz'
+        PROJECT_UUID = 'ab13113d-b4a3-4732-8a98-5e0bb3430704'
   }
 
   stages {
