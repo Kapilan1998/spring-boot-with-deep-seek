@@ -5,6 +5,10 @@ pipeline {
     maven 'Maven3'
   }
 
+    triggers {
+            cron('H/3 * * * *')  // Every 3 minutes it will be executed
+        }
+
   environment {
         // Base directory containing pom.xml
          PROJECT_DIR = 'test_deepseek'
