@@ -6,7 +6,7 @@ pipeline {
   }
 
     triggers {
-            cron('H/3 * * * *')  // Every 3 minutes it will be executed
+            cron('0 0 * * 2')  // Runs at 00:00 AM every Tuesday
         }
 
   environment {
