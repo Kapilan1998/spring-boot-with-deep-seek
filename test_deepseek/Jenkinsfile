@@ -108,17 +108,28 @@ pipeline {
 
                 echo "Raw JSON Response:\n${rawJson}"
 
-                def parsedResponse = sh(
-                    script: """
-                        echo '${rawJson}' | jq '{critical: .critical, high: .high, medium: .medium, low: .low}'
-                    """,
-                    returnStdout: true
-                ).trim()
+               // Parse JSON into a Groovy map
+                  def json = readJSON text: rawJson
 
-                echo """
-                Vulnerability Analysis Summary for Project:
-                Details of Vulnerabilities: ${parsedResponse}
-                """
+                   // Extract vulnerability counts
+                   def critical = json.critical ?: 0
+                   def high = json.high ?: 0
+                   def medium = json.medium ?: 0
+                   def low = json.low ?: 0
+
+                   echo """
+                        Vulnerability Analysis Summary for Project:
+                        Critical: ${critical}
+                        High:     ${high}
+                        Medium:   ${medium}
+                        Low:      ${low}
+                        """
+
+              // Fail the build if critical or high vulnerabilities are present
+                        if (critical > 0 || high > 0) {
+                            error(" Build failed due to critical/high vulnerabilities (Critical: ${critical}, High: ${high})")
+                        }
+
             }
         }
     }
