@@ -99,7 +99,7 @@ pipeline {
 
                 def rawJson = sh(
                     script: """
-                        curl -s -X "GET" "http://localhost:8082/api/v1/metrics/project/${PROJECT_UUID}/current" \\
+                        curl -s -X "GET" "http://kapilan-apiserver-1:8080/api/v1/metrics/project/${PROJECT_UUID}/current" \\
                              -H "X-API-Key: ${DEP_TRACK_API_KEY}" \\
                              -H "Accept: application/json"
                     """,
@@ -122,6 +122,7 @@ pipeline {
             }
         }
     }
+
 
 
 
